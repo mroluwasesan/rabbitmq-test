@@ -1,0 +1,7 @@
+services:
+  rabbitmq:
+    env_file: .env
+      
+  nginx:
+    ports:
+      - 8080:80

@@ -1,0 +1,51 @@
+name: telex_queue
+
+services:
+  api:
+    build:
+      dockerfile: Telex.Messaging.Api/Dockerfile
+    image: ${COMPOSE_PROJECT_NAME}:api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: "curl -s http://localhost:8080"
+      interval: 5s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
+  worker:
+    build:
+      dockerfile: Telex.Messaging.Workers/Dockerfile
+    image: ${COMPOSE_PROJECT_NAME}:worker
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    restart: unless-stopped
+
+  rabbitmq:
+    image: rabbitmq:3-alpine
+    volumes:
+      - rabbitmq:/var/lib/rabbitmq
+    healthcheck:
+      test: "rabbitmq-diagnostics check_running"
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    depends_on:
+      api:
+        condition: service_healthy
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/nginx.conf
+
+volumes:
+  rabbitmq:

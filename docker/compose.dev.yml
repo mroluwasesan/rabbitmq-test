@@ -1,0 +1,9 @@
+name: telex_queue_dev
+
+services:
+  rabbitmq:
+    env_file: .env.dev
+      
+  nginx:
+    ports:
+      - 8080:80

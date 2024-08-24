@@ -1,0 +1,11 @@
+# Ignore Git-related files
+.git*
+
+# Ignore Docker-related files
+docker
+compose.*
+.dockerignore
+
+# Ignore other unnecessary files
+*.md
+.env*
